@@ -72,10 +72,10 @@ function git_status {
             status="$status\[\e[01;31m\][✓] "
         fi
 
-        # local committed="$(echo $status_output | grep "Changes to be committed:" | wc -l)"
-        # if [[ "$committed" -gt 0 ]]; then
-        #     status="$status\[\e[01;32m\][✓] "
-        # fi
+        local committed="$(echo $status_output | grep "Your branch is ahead of" | wc -l)"
+        if [[ "$committed" -gt 0 ]]; then
+            status="$status\[\e[01;32m\][✓] "
+        fi
     fi    
     echo "$status"
 }
