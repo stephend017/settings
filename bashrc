@@ -42,7 +42,7 @@ case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
 esac
 
-
+# Returns the current git branch 
 function git_branch {
     local inside_git_repo="$(git rev-parse --is-inside-work-tree 2>/dev/null)" 
 
@@ -54,6 +54,8 @@ function git_branch {
     fi    
 }
 
+# returns a list of status modifiers to 
+# directly be output to the terminal
 function git_status {
     local inside_git_repo="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
     local status=""
