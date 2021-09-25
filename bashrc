@@ -158,6 +158,15 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
+alias dc='docker-compose'
+alias dcb='docker-compose build'
+alias dcu='docker-compose up'
+alias dcd='docker-compose down'
+
+alias droplet-root='ssh root@204.48.31.202'
+alias droplet='ssh sed@204.48.31.202'
+
+
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
@@ -170,3 +179,7 @@ if ! shopt -oq posix; then
 fi
 
 PROMPT_COMMAND=set_colored_PS1
+
+
+# set environment variables
+source /etc/environment
