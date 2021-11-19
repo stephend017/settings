@@ -86,8 +86,30 @@ function git_status {
 # <local-time> <user> <git branch> <git status> 
 # TODO 
 function set_colored_PS1 {
-	PS1="\[\e[0;32m\][\#] \[\e[01;31m\][\w] $(git_status)\n\[\e[0;34m\][\@] \[\e[0;35m\][\u] \[\e[0;39m\]$(git_branch)$ "
+	left="\[\e[0;32m\][\#] \[\e[01;34m\][\w] $(git_status)"
+    PS1="$left\n\[\e[0;33m\][\u] \[\e[0;39m\]$(git_branch)$ "
 
+    # Create a string like:  "[ Apr 25 16:06 ]" with time in PURPLE.
+    printf -v PS1RHS "\e[0m[ \e[0;1;35m%(%b %d %H:%M)T \e[0m]" -1 # -1 is current time
+
+    # Strip ANSI commands before counting length
+    # From: https://www.commandlinefu.com/commands/view/12043/remove-color-special-escape-ansi-codes-from-text-with-sed
+    PS1RHS_stripped=$(sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" <<<"$PS1RHS")
+
+    # Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
+    local Save='\e[s' # Save cursor position
+    local Rest='\e[u' # Restore cursor to save point
+
+    # Save cursor position, jump to right hand edge, then go left N columns where
+    # N is the length of the printable RHS string. Print the RHS string, then
+    # return to the saved position and print the LHS prompt.
+
+    # Note: "\[" and "\]" are used so that bash can calculate the number of
+    # printed characters so that the prompt doesn't do strange things when
+    # editing the entered text.
+
+    # PS1="\[${Save}\e[${COLUMNS:-$(tput cols)}C\e[${#PS1RHS_stripped}D${PS1RHS}${Rest}\]${PS1}"
+    PS1="\[${Save}\e[${COLUMNS:-$(tput cols)}C\e[${#PS1RHS_stripped}D${PS1RHS}${Rest}\]${PS1}"
 }
 
 
@@ -182,4 +204,4 @@ PROMPT_COMMAND=set_colored_PS1
 
 
 # set environment variables
-source /etc/environment
+# source /etc/environment
