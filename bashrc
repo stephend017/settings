@@ -86,8 +86,8 @@ function git_status {
 # <local-time> <user> <git branch> <git status> 
 # TODO 
 function set_colored_PS1 {
-	left="\[\e[0;32m\][\#] \[\e[01;34m\][\w] $(git_status)"
-    PS1="$left\n\[\e[0;33m\][\u] \[\e[0;39m\]$(git_branch)$ "
+	left="\[\e[0;32m\][\#] \[\e[01;33m\][\u] $(git_status)"
+    PS1="$left\n\[\e[0;34m\][\w] \[\e[0;39m\]$(git_branch)$ "
 
     # Create a string like:  "[ Apr 25 16:06 ]" with time in PURPLE.
     printf -v PS1RHS "\e[0m[ \e[0;1;35m%(%b %d %H:%M)T \e[0m]" -1 # -1 is current time
@@ -188,6 +188,7 @@ alias dcd='docker-compose down'
 alias droplet-root='ssh root@204.48.31.202'
 alias droplet='ssh sed@204.48.31.202'
 
+alias guoba='ssh stephen@192.168.10.191'
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -204,4 +205,8 @@ PROMPT_COMMAND=set_colored_PS1
 
 
 # set environment variables
-# source /etc/environment
+source /etc/environment
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
