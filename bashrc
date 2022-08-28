@@ -81,7 +81,7 @@ function git_status {
 }
 
 # function to flip a coin when needing to make a 50/50 decision
-coinflip() {
+coinFlip() {
     COIN=$(($RANDOM%2))
     if [[ $COIN -eq 1 ]]; then
         echo "HEADS"
