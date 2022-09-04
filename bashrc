@@ -2,6 +2,11 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+DIR="${BASH_SOURCE%/*}"
+if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+source "$DIR/settings/colors.sh"
+source "$DIR/settings/git_util.sh"
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -42,44 +47,6 @@ case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
 esac
 
-# Returns the current git branch 
-function git_branch {
-    local inside_git_repo="$(git rev-parse --is-inside-work-tree 2>/dev/null)" 
-
-    if [ "$inside_git_repo" ]; then
-        local branch="$(git status | grep "On branch" | awk '{print $NF}')"
-        echo "[$branch] "
-    else
-        echo ""
-    fi    
-}
-
-# returns a list of status modifiers to 
-# directly be output to the terminal
-function git_status {
-    local inside_git_repo="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
-    local status=""
-    if [ "$inside_git_repo" ]; then
-        local status_output="$(git status)"
-
-        local unstaged="$(echo $status_output | grep "Changes not staged for commit:" | wc -l)"
-        if [[ "$unstaged" -gt 0 ]]; then
-            status="$status\[\e[01;31m\][+] "
-        fi
-
-        local staged="$(echo $status_output | grep "Changes to be committed:" | wc -l)"
-        if [[ "$staged" -gt 0 ]]; then
-            status="$status\[\e[01;31m\][✓] "
-        fi
-
-        local committed="$(echo $status_output | grep "Your branch is ahead of" | wc -l)"
-        if [[ "$committed" -gt 0 ]]; then
-            status="$status\[\e[01;32m\][✓] "
-        fi
-    fi    
-    echo "$status"
-}
-
 # function to flip a coin when needing to make a 50/50 decision
 coinFlip() {
     COIN=$(($RANDOM%2))
@@ -96,30 +63,38 @@ coinFlip() {
 # <local-time> <user> <git branch> <git status> 
 # TODO 
 function set_colored_PS1 {
-	left="\[\e[0;32m\][\#] \[\e[01;34m\][\w] $(git_status)"
-    PS1="$left\n\[\e[0;33m\][\u] \[\e[0;39m\]$(git_branch)$ "
+    PS1="\[${BG_SECONDARY}${FG_SECONDARY}\] \w \[$(reset_colors)\]"
+    if [[ $(inside_git_repo) ]]; then 
+        gs=$(git status)
+        ghtf=$(git_has_untracked_files "$gs")
+        ghuc=$(git_has_unstaged_files "$gs")
+        ghsf=$(git_has_staged_files "$gs")
+        ghcf=$(git_has_committed_files "$gs")
+        
+        PS1+="\[$(git_branch_bg_color "$ghtf" "$ghuc" "$ghsf" "$ghcf")$(git_branch_fg_color "$ghtf" "$ghuc" "$ghsf" "$ghcf")\] $(git_branch "$gs") \[$(reset_colors)\]"
 
-    # Create a string like:  "[ Apr 25 16:06 ]" with time in PURPLE.
-    printf -v PS1RHS "\e[0m[ \e[0;1;35m%(%b %d %H:%M)T \e[0m]" -1 # -1 is current time
+        if [[ $ghtf -gt 0 ]]; then 
+            PS1+="\[${BG_ERROR}${FG_ERROR}\] + \[$(reset_colors)\]"
+        fi
+        if [[ $ghuc -gt 0 ]]; then 
+            PS1+="\[${BG_ERROR}${FG_ERROR}\] ! \[$(reset_colors)\]"
+        fi
+        if [[ $ghsf -gt 0 ]]; then 
+            PS1+="\[${BG_WARNING}${FG_WARNING}\] ✓ \[$(reset_colors)\]"
+        fi
+        if [[ $ghcf -gt 0 ]]; then 
+            PS1+="\[${BG_SUCCESS}${FG_SUCCESS}\] ✓ \[$(reset_colors)\]"
+        fi
+    fi
+    PS1+="\n"
+    # set user
+    PS1+="\[${BG_PRIMARY}${FG_PRIMARY}\] \u \[$(reset_colors)\] "
 
-    # Strip ANSI commands before counting length
-    # From: https://www.commandlinefu.com/commands/view/12043/remove-color-special-escape-ansi-codes-from-text-with-sed
-    PS1RHS_stripped=$(sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" <<<"$PS1RHS")
-
-    # Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
+    RIGHT="\[${FG_HIDDEN}\] \t "
     local Save='\e[s' # Save cursor position
     local Rest='\e[u' # Restore cursor to save point
-
-    # Save cursor position, jump to right hand edge, then go left N columns where
-    # N is the length of the printable RHS string. Print the RHS string, then
-    # return to the saved position and print the LHS prompt.
-
-    # Note: "\[" and "\]" are used so that bash can calculate the number of
-    # printed characters so that the prompt doesn't do strange things when
-    # editing the entered text.
-
-    # PS1="\[${Save}\e[${COLUMNS:-$(tput cols)}C\e[${#PS1RHS_stripped}D${PS1RHS}${Rest}\]${PS1}"
-    PS1="\[${Save}\e[${COLUMNS:-$(tput cols)}C\e[${#PS1RHS_stripped}D${PS1RHS}${Rest}\]${PS1}"
+    
+    PS1="\[${Save}\]\e[${COLUMNS:-$(tput cols)}C\e["9"D${RIGHT}\[${Rest}\]${PS1}"
 }
 
 
