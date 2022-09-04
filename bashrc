@@ -94,7 +94,7 @@ function set_colored_PS1 {
     local Save='\e[s' # Save cursor position
     local Rest='\e[u' # Restore cursor to save point
     
-    PS1="\[${Save}\]\e[${COLUMNS:-$(tput cols)}C\e["9"D${RIGHT}\[${Rest}\]${PS1}"
+    PS1="\[${Save}\]\e[${COLUMNS:-$(tput cols)}C\e["10"D${RIGHT}\[${Rest}\]${PS1}"
 }
 
 
