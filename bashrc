@@ -80,6 +80,16 @@ function git_status {
     echo "$status"
 }
 
+# function to flip a coin when needing to make a 50/50 decision
+coinFlip() {
+    COIN=$(($RANDOM%2))
+    if [[ $COIN -eq 1 ]]; then
+        echo "HEADS"
+    else
+        echo "TAILS"
+    fi
+}
+
 # color prompt function
 # creates a prompt in the following format
 # <working directory>
