@@ -90,7 +90,7 @@ function set_colored_PS1 {
     # set user
     PS1+="\[${BG_PRIMARY}${FG_PRIMARY}\] \u \[$(reset_colors)\] "
 
-    RIGHT="\[${FG_HIDDEN}\] \t "
+    RIGHT="\[${BG_HIDDEN}\] \t "
     local Save='\e[s' # Save cursor position
     local Rest='\e[u' # Restore cursor to save point
     

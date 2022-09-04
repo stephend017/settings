@@ -28,3 +28,4 @@ FG_WARNING=$(fg_rgb "51" "65" "85")
 BG_WARNING=$(bg_rgb "239" "202" "8")
 
 FG_HIDDEN=$(fg_rgb "83" "88" "99")
+BG_HIDDEN=$(bg_rgb "83" "88" "99")
